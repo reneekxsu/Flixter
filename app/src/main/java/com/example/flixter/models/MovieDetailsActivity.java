@@ -1,6 +1,7 @@
 package com.example.flixter.models;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -46,7 +47,22 @@ public class MovieDetailsActivity extends AppCompatActivity {
         rbVoteAverage.setRating(voteAverage / 2.0f);
 
         String imageURL;
-        imageURL = movie.getPosterPath();
-        Glide.with(context).load(imageURL).placeholder(R.drawable.flicks_movie_placeholder).into(ivPoster);
+        int ph;
+        // if phone landscape, then set imageurl = backdrop
+        // else set imageurl = poster
+
+        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            imageURL = movie.getBackdropPath();
+            ph = R.drawable.flicks_backdrop_placeholder;
+        } else {
+            imageURL = movie.getPosterPath();
+            ph = R.drawable.flicks_movie_placeholder;
+        }
+
+        Glide.with(context).load(imageURL).placeholder(ph).into(ivPoster);
+
+//        String imageURL;
+//        imageURL = movie.getPosterPath();
+//        Glide.with(context).load(imageURL).placeholder(R.drawable.flicks_movie_placeholder).into(ivPoster);
     }
 }
