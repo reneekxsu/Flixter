@@ -14,7 +14,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterInside;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.example.flixter.R;
+import com.example.flixter.databinding.ItemsMovieBinding;
 import com.example.flixter.models.Movie;
 import com.example.flixter.models.MovieDetailsActivity;
 
@@ -27,6 +30,7 @@ public class MovieAdapter  extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
 
     Context context;
     List<Movie> movies;
+    ItemsMovieBinding binding;
 
     public MovieAdapter(Context context, List<Movie> movies) {
         this.context = context;
@@ -39,8 +43,10 @@ public class MovieAdapter  extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
     // involves inflating a layout from XML and returning the holder
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         Log.d("MovieAdapter","onCreateViewHolder");
-        View movieView = LayoutInflater.from(context).inflate(R.layout.items_movie,parent,false);
-        return new ViewHolder(movieView);
+        binding = ItemsMovieBinding.inflate(LayoutInflater.from(context), parent, false);
+        //View movieView = LayoutInflater.from(context).inflate(R.layout.items_movie,parent,false);
+        View view = binding.getRoot();
+        return new ViewHolder(view);
     }
 
     @Override
@@ -59,7 +65,7 @@ public class MovieAdapter  extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
         return movies.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView tvTitle;
         TextView tvOverview;
@@ -67,26 +73,28 @@ public class MovieAdapter  extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
 
         public ViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
-            tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvOverview = itemView.findViewById(R.id.tvOverview);
-            ivPoster = itemView.findViewById(R.id.ivPoster);
-            itemView.setOnClickListener(this);
+                tvTitle = binding.tvTitle;
+                tvOverview = binding.tvOverview;
+                ivPoster = binding.ivPoster;
+
+                binding.getRoot().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            Movie movie = movies.get(position);
+                            Intent intent = new Intent(context, MovieDetailsActivity.class);
+                            intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie));
+                            context.startActivity(intent);
+                        }
+                    }
+                });
         }
 
-        public void onClick(View v){
-            int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION){
-                Movie movie = movies.get(position);
-                Intent intent = new Intent(context, MovieDetailsActivity.class);
-                intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie));
-                context.startActivity(intent);
-            }
-        }
 
         public void bind(Movie movie) {
             tvTitle.setText(movie.getTitle());
             tvOverview.setText(movie.getOverview());
-
             String imageURL;
             int ph;
             // if phone landscape, then set imageurl = backdrop
@@ -100,7 +108,10 @@ public class MovieAdapter  extends RecyclerView.Adapter<MovieAdapter.ViewHolder>
                 ph = R.drawable.flicks_movie_placeholder;
             }
 
-            Glide.with(context).load(imageURL).placeholder(ph).into(ivPoster);
+            int radius = 30;
+            int margin = 0;
+//            Glide.with(context).load(imageURL).placeholder(ph).into(ivPoster);
+            Glide.with(context).load(imageURL).transform(new CenterInside(), new RoundedCorners(radius)).placeholder(ph).into(ivPoster);
         }
     }
 }
