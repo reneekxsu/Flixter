@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String NOW_PLAYING_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=28460c40a4afd80b08ad39ad987de33a";
     public static final String TAG = "MainActivity";
 
+
     List<Movie> movies;
 
     @Override
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         // set layout manager on recycler view
         rvMovies.setLayoutManager(new LinearLayoutManager(this));
 
+        String TRAILER_URL;
 
         AsyncHttpClient client = new AsyncHttpClient();
         client.get(NOW_PLAYING_URL, new JsonHttpResponseHandler() {
