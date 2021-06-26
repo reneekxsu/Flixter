@@ -1,7 +1,6 @@
 package com.example.flixter.models;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,11 +43,14 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        Log.i("MovieDetailsActivity","onCreate called");
 //        setContentView(R.layout.activity_movie_details);
         ActivityMovieDetailsBinding binding = ActivityMovieDetailsBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
 
 
         movie = (Movie) Parcels.unwrap(getIntent().getParcelableExtra(Movie.class.getSimpleName()));
@@ -72,18 +74,20 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
             @Override
             public void onClick(View v) {
 //                Intent intent = new Intent(context, MovieTrailerActivity.class);
+                Log.i("MovieDetailsActivity","poster clicked");
                 if (videoID != null) {
 //                    intent.putExtra("videoID", videoID);
 //                    context.startActivity(intent);
 
                     YouTubePlayerView playerView = (YouTubePlayerView) findViewById(R.id.player);
-                    ivPoster.setVisibility(View.GONE);
+                    Log.i("MovieDetailsActivity","YouTubePlayerView initialized");
+                    ivPoster.setVisibility(View.INVISIBLE);
                     playerView.setVisibility(View.VISIBLE);
 
                     playerView.initialize("AIzaSyB-CMakXTdlPpMG26qWSXdEJjgz-JPNN9A", new YouTubePlayer.OnInitializedListener() {
                         @Override
                         public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-                            youTubePlayer.cueVideo(videoID);
+                            youTubePlayer.loadVideo(videoID);
                         }
 
                         @Override
@@ -109,13 +113,16 @@ public class MovieDetailsActivity extends YouTubeBaseActivity {
         // if phone landscape, then set imageurl = backdrop
         // else set imageurl = poster
 
-        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
-            imageURL = movie.getBackdropPath();
-            ph = R.drawable.flicks_backdrop_placeholder;
-        } else {
-            imageURL = movie.getPosterPath();
-            ph = R.drawable.flicks_movie_placeholder;
-        }
+        imageURL = movie.getPosterPath();
+        ph = R.drawable.flicks_movie_placeholder;
+
+//        if (context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+//            imageURL = movie.getBackdropPath();
+//            ph = R.drawable.flicks_backdrop_placeholder;
+//        } else {
+//            imageURL = movie.getPosterPath();
+//            ph = R.drawable.flicks_movie_placeholder;
+//        }
 
         int radius = 30;
         Glide.with(context).load(imageURL).transform(new CenterInside(), new RoundedCorners(radius)).placeholder(ph).into(ivPoster);
